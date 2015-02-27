@@ -9,7 +9,7 @@ class SearchWindow(SearchInterface):
         """
         self._iwin = input_win
         self._rwin = relevant_win
-        self._rmaxx, self._rmaxy = relevant_win.getmaxyx()
+        self._rmaxy, self._rmaxx = relevant_win.getmaxyx()
 
     def _fix(self):
         """
@@ -53,13 +53,13 @@ class SearchWindow(SearchInterface):
         word_y = 1
         max_index = 0
         for word in relevant:
+            if word_y > self._rmaxy - 2:
+                break
             if max_index == highlight_index:
                 self._rwin.addstr(word_y, 1, word, curses.color_pair(1))
             else:
                 self._rwin.addstr(word_y, 1, word)
             word_y += 1
-            if word_y > self._rmaxy - 2:
-                break
             max_index += 1
         self._fix()
         return max_index - 1
