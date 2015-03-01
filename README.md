@@ -9,9 +9,11 @@
 - Linux + Python3即可
 - DBgenerate文件夹内的不是运行的必要组件，那是我爬单词解释和例句用的，运行需要额外的requests和BeautifulSoup库
 
-## 配置
-1. 修改mydict脚本中(/your/path/to/MyDict/main.py),添加mydict执行权限(chmod u+x mydict)，执行 **./mydict** 试运行
-2. 为方便平日使用，可以在 ~/bin 目录中建立相应的软链接到mydict，并把 ~/bin目录放在shell的搜索路径中
+## (几乎零)配置
+> 最终目标是在shell输入**mydict**命令即可打开字典
+
+1. 修改mydict脚本中的内容(/your/path/to/MyDict/main.py), 添加mydict执行权限(chmod u+x mydict)，此时可以执行 **./mydict** 试运行
+2. 在 ~/bin 目录中建立相应的软链接到mydict，并把 ~/bin目录放在shell的搜索路径中
 3. 根目录下有CONFIG配置文件，主要为了人工控制兼容各种控制台大小，正常情况下不需要配置
 
 ## 快捷键
@@ -19,7 +21,7 @@
 -  ctrl-p 向上选择候选词
 -  Tab 根据当前选择补全输入单词
 -  Enter 确认
--  ctrl-g 退出（可用于取消输入、退出程序）
+-  ctrl-g 后退（可用于取消输入、退出程序）
 -  BackSpace 删除一个字母
 -  任何时候输入字母打开左侧的输入框
 
