@@ -48,10 +48,13 @@ class SearchWindow(SearchInterface):
     def show_relevant(self, relevant, highlight_index):
         """
         展示候选单词
+        :relevant: 备选词集合
+        :highlight_index: 需要高亮的备选词下标
         """
         self._rwin.clear()
         word_y = 1
         max_index = 0
+        relevant = sorted(relevant)
         for word in relevant:
             if word_y > self._rmaxy - 2:
                 break
