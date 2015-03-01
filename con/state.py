@@ -48,8 +48,8 @@ class SearchControllerState(ControllerState):
         根据补全单词更新显示
         更新选中单词的下标
         """
-        controller._relevent = controller._tree.get_relevant(controller._word)
-        controller._cn_last = controller._swin.show_relevant(controller._relevent, 0)
+        controller._set_relevant(controller._tree.get_relevant(controller._word))
+        controller._cn_last = controller._swin.show_relevant(controller._relevant, 0)
         controller._sindex = 0
 
     @staticmethod
@@ -96,7 +96,7 @@ class SearchControllerState(ControllerState):
         """
         补全,或向上向下移动
         """
-        controller._word = controller._relevent[controller._sindex]
+        controller._word = controller._relevant[controller._sindex]
         controller._swin.show_input_word(controller._word)
         SearchControllerState._update_relevant(controller)
 
@@ -113,13 +113,13 @@ class SearchControllerState(ControllerState):
     def c_p(controller):
         if controller._sindex >= 1:
             controller._sindex -= 1
-            controller._swin.show_relevant(controller._relevent, controller._sindex)
+            controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod
     def c_n(controller):
         if controller._sindex < controller._cn_last:
             controller._sindex += 1
-            controller._swin.show_relevant(controller._relevent, controller._sindex)
+            controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod
     def recover(controller):

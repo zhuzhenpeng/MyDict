@@ -98,3 +98,9 @@ class MainController:
         """
         self._main_win.touchwin()
         self._main_win.refresh()
+
+    def _set_relevant(self, relevant):
+        """
+        按字母排序并设置相关单词集合
+        """
+        self._relevant = sorted(relevant)

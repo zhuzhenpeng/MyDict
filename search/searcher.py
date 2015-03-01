@@ -54,7 +54,6 @@ class SearchWindow(SearchInterface):
         self._rwin.clear()
         word_y = 1
         max_index = 0
-        relevant = sorted(relevant)
         for word in relevant:
             if word_y > self._rmaxy - 2:
                 break
