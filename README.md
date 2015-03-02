@@ -7,7 +7,7 @@
 
 ## 运行环境
 - Linux + Python3即可
-- DBgenerate文件夹内的不是运行的必要组件，那是我爬单词解释和例句用的，运行需要额外的requests和BeautifulSoup库
+- DBGenerate文件夹内的不是运行的必要组件，那是我爬单词解释和例句用的，运行需要额外的requests和BeautifulSoup库
 
 ## (几乎零)配置
 > 最终目标是在shell输入**mydict**命令即可打开字典
