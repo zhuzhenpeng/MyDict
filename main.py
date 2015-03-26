@@ -1,5 +1,6 @@
 import curses
 import math
+import threading
 from con.mcon import MainController
 from display.displayer import DisplayWindow
 from search.searcher import SearchWindow
@@ -57,6 +58,12 @@ def main(screen):
     # 初始化控制器
     controller = MainController(screen, display_win, 
             search_win, d, tree)
+
+    # 预热数据库
+    db_thread = threading.Thread(target=d.ready)
+    db_thread.start()
+
+    # 控制器进入事件循环状态
     controller.work()
 
 

@@ -26,4 +26,16 @@ class Dictionary(DictionaryInterface):
         result = c.execute(self.SEARCH_A_WORD, word).fetchone()
         if result is None:
             result = ('', '')
+        c.close()
         return result
+
+    def ready(self):
+        """
+        通过发送一条指令预热数据库
+        """
+        word = ('hello', )
+        conn = sqlite3.connect('./dict.db')
+        c = conn.cursor()
+        result = c.execute(self.SEARCH_A_WORD, word).fetchone()
+        c.close()
+        conn.close()
