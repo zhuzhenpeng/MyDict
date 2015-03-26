@@ -12,6 +12,9 @@ class Dictionary(DictionaryInterface):
 
         self.__conn = sqlite3.connect('./dict.db')
 
+    def __def__(self):
+        self.__conn.close()
+
     def get_meaning(self, word):
         """
         获取单词释义
