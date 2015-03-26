@@ -4,4 +4,7 @@ __pycache__/
 DBGenerate/clean
 DBGenerate/dict.db
 
+# 数据库，从网盘下载即可
 dict.db
+
+mydict
