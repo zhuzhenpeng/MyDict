@@ -96,9 +96,10 @@ class SearchControllerState(ControllerState):
         """
         补全,或向上向下移动
         """
-        controller._word = controller._relevant[controller._sindex]
-        controller._swin.show_input_word(controller._word)
-        SearchControllerState._update_relevant(controller)
+        if len(controller._relevant) != 0:
+            controller._word = controller._relevant[controller._sindex]
+            controller._swin.show_input_word(controller._word)
+            SearchControllerState._update_relevant(controller)
 
     @staticmethod
     def c_g(controller):
