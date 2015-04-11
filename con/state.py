@@ -94,7 +94,7 @@ class SearchControllerState(ControllerState):
     @staticmethod
     def tab(controller):
         """
-        补全,或向上向下移动
+        通过当前高亮的单词补全输入单词
         """
         if len(controller._relevant) != 0:
             controller._word = controller._relevant[controller._sindex]
@@ -112,15 +112,27 @@ class SearchControllerState(ControllerState):
 
     @staticmethod
     def c_p(controller):
-        if controller._sindex >= 1:
+        """
+        候选高亮位置向上移动，如果在顶端则移到低端
+        """
+        if controller._sindex == 0:
+            controller._sindex = controller._cn_last;
+        elif controller._sindex >= 1:
             controller._sindex -= 1
-            controller._swin.show_relevant(controller._relevant, controller._sindex)
+        
+        controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod
     def c_n(controller):
-        if controller._sindex < controller._cn_last:
+        """
+        候选高亮位置向下移动，如果在底端则移到顶端
+        """
+        if controller._sindex == controller._cn_last:
+            controller._sindex = 0
+        elif controller._sindex < controller._cn_last:
             controller._sindex += 1
-            controller._swin.show_relevant(controller._relevant, controller._sindex)
+        
+        controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod
     def recover(controller):
