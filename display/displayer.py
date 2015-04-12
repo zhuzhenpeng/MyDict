@@ -16,10 +16,15 @@ class DisplayWindow(DisplayInterface):
 
         # 设置版本号
         self._VERSION = 'MyDict V1.0'
-        self._window.addstr(self._maxy-1, self._maxx-12, self._VERSION, curses.color_pair(1))
+        self._window.addstr(self._maxy-1, self._maxx-12, 
+                                self._VERSION, curses.color_pair(1))
 
         # 设置欢迎词和自定义文本
-        self._window.addstr(self._WELCOME_Y, self._WELCOME_X, self._WELCOME, curses.color_pair(3))
+        self._window.addstr(self._WELCOME_Y, self._WELCOME_X, 
+                                self._WELCOME, curses.color_pair(3))
+        
+        # 设置欢迎画面
+        self._init_pic()
 
         # 设置单词的坐标
         self._word_x = math.floor(self._maxx * 0.45)
@@ -29,7 +34,11 @@ class DisplayWindow(DisplayInterface):
 
     def _read_conf(self):
         """
-        读取配置文件
+        读取配置文件,可以获得以下的参数：
+        1.左上角欢迎词，以及它的坐标
+        2.首页图片的坐标
+        3.单词解释的坐标
+        4.例句的坐标
         """
         config = configparser.ConfigParser()
         config.read('CONFIG')
@@ -40,6 +49,13 @@ class DisplayWindow(DisplayInterface):
             self._WELCOME_X = 2
         if self._WELCOME_Y == 0:
             self._WELCOME_Y = 1
+
+        self._PIC_X = int(config['HomePage']['pic_x'])
+        self._PIC_Y = int(config['HomePage']['pic_y'])
+        if self._PIC_X == 0:
+            self._PIC_X = self._maxx // 8 + 2
+        if self._PIC_Y == 0:
+            self._PIC_Y = self._WELCOME_Y + 3
 
         self._MEANINGS_X = int(config['Word']['meanings_x'])
         self._MEANINGS_Y = int(config['Word']['meanings_y'])
@@ -52,6 +68,31 @@ class DisplayWindow(DisplayInterface):
         self._EXAMPLES_Y = 0 
         if self._EXAMPLES_X == 0:
             self._EXAMPLES_X = 1
+
+    def _init_pic(self):
+        """
+        读取起始画面
+        当控制台的大小适合时才会读取画面
+        """
+        lines = []
+        max_line_length = 0
+        line_cnt = 0
+
+        with open('PICTURE', 'r') as pic_file:
+            for line in pic_file:
+                if len(line) > max_line_length:
+                    max_line_length = len(line)
+                line_cnt += 1
+                lines.append(line)
+
+        if max_line_length > self._maxx - 6 or line_cnt > self._maxy - 6:
+            return
+        else:
+            pic_y = self._PIC_Y
+            for line in lines:
+                self._window.addstr(pic_y, self._PIC_X, line)
+                pic_y += 1
+
 
     def display_word(self, word):
         """
@@ -84,7 +125,8 @@ class DisplayWindow(DisplayInterface):
         每个例句用#分割，例句中的中英文用|分割
         """
         line = '-------------' * 4
-        self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X, line, curses.color_pair(1))
+        self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X, 
+                                            line, curses.color_pair(1))
         increment = 1
         for example in examples.split('|'):
             sentence = example.split('#')

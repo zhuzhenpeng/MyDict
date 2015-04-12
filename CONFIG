@@ -10,6 +10,10 @@ welcome = 欢迎回来
 welcome_x = 0
 welcome_y = 0
 
+# 图片
+pic_x = 0
+pic_y = 0
+
 
 [Word]
 # 单词解释
