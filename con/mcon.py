@@ -1,6 +1,7 @@
+# coding=utf-8
 import curses
-from con.state import SearchControllerState
 from con.state import DisplayControllerState
+
 
 class MainController:
     """
@@ -9,7 +10,7 @@ class MainController:
     """
 
     def __init__(self, main_win, dis_win, sch_win,
-            dictionary, t):
+                 dictionary, t):
         """
         :main_win:  curses初始化时产生的窗口
         :dis_win:   查询结果展示窗口
@@ -40,7 +41,6 @@ class MainController:
         # 初始化状态
         self._change_to_state(DisplayControllerState)
 
-
     def work(self):
         """
         进入工作循环，捕捉键盘输入
@@ -51,10 +51,10 @@ class MainController:
 
                 # 输入字母
                 if (raw_ch >= 65 and raw_ch <= 90) or \
-                        (raw_ch >= 97 and raw_ch <=122):
-                        if len(self._word) < 26:
-                            self._word += chr(raw_ch)
-                        self._state.alpha(self, raw_ch)
+                        (raw_ch >= 97 and raw_ch <= 122):
+                    if len(self._word) < 26:
+                        self._word += chr(raw_ch)
+                    self._state.alpha(self, raw_ch)
 
                 # 输入C-g
                 if raw_ch == 7:

@@ -1,6 +1,6 @@
 import sqlite3
 
-#单词数据库的建立、插入、查询
+# 单词数据库的建立、插入、查询
 
 CREATE_TABLE = """
     CREATE TABLE IF NOT EXISTS words(
@@ -12,25 +12,26 @@ CREATE_TABLE = """
 INSERT_A_WORD = 'INSERT INTO words VALUES (?, ?, ?)'
 SEARCH_A_WORD = 'SELECT * FROM words WHERE word=?'
 
+
 class DictDB:
-    def __init__(this):
-        this.__conn = sqlite3.connect('./dict.db')
-        this.__conn.execute(CREATE_TABLE)
-    
-    def put_record_into_db(this, record):
-        c = this.__conn.cursor()
+    def __init__(self):
+        self.__conn = sqlite3.connect('./dict.db')
+        self.__conn.execute(CREATE_TABLE)
+
+    def put_record_into_db(self, record):
+        c = self.__conn.cursor()
         word, result = record
         meanings, examples = result.split('|$')
         c.execute(INSERT_A_WORD, (word, meanings, examples))
-        this.__conn.commit()
+        self.__conn.commit()
         print('----------' + word + '----------')
-    
-    def search_meaning(this, word):
-        word = (word.strip(), )
-        c = this.__conn.cursor()
+
+    def search_meaning(self, raw_word):
+        word = (raw_word.strip(), )
+        c = self.__conn.cursor()
         result = c.execute(SEARCH_A_WORD, word).fetchone()
         return result
-        
+
 
 if __name__ == '__main__':
     print('----测试数据库查词----')

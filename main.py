@@ -5,11 +5,13 @@ from con.mcon import MainController
 from display.displayer import DisplayWindow
 from search.searcher import SearchWindow
 from search.trie import Trie
-from dictionary.dictionary import Dictionary 
+from dictionary.dictionary import Dictionary
 
 # 设置工作目录为当前文件所在的目录
 import os
+
 os.chdir(os.path.dirname(__file__))
+
 
 def init_curses():
     # 设置颜色
@@ -26,6 +28,7 @@ def init_curses():
     # 没有输入光标
     curses.curs_set(False)
 
+
 def init_trie():
     # 初始化字典树
     tree = Trie()
@@ -34,30 +37,31 @@ def init_trie():
             tree.insert(line.strip())
     return tree
 
+
 def main(screen):
     init_curses()
 
     # 初始化展示窗口
     display_y, display_x = screen.getmaxyx()
     display_win = DisplayWindow(curses.newwin(
-        display_y-2, display_x-2, 1, 1))
+        display_y - 2, display_x - 2, 1, 1))
 
     # 初始化查询窗口
-    search_y , search_x = screen.getmaxyx()
+    search_y, search_x = screen.getmaxyx()
     search_x = math.floor(search_x * 0.3)
     search_win = SearchWindow(
-            curses.newwin(3, search_x, 0, 0),
-            curses.newwin(search_y-3, search_x, 3, 0))
+        curses.newwin(3, search_x, 0, 0),
+        curses.newwin(search_y - 3, search_x, 3, 0))
 
     # 初始化字典
     d = Dictionary()
-    
+
     # 初始化字典树
     tree = init_trie()
-    
+
     # 初始化控制器
-    controller = MainController(screen, display_win, 
-            search_win, d, tree)
+    controller = MainController(screen, display_win,
+                                search_win, d, tree)
 
     # 预热数据库
     db_thread = threading.Thread(target=d.ready)

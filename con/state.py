@@ -1,3 +1,4 @@
+# coding=utf-8
 class ControllerState:
     """
     控制器管理状态的基类
@@ -119,7 +120,7 @@ class SearchControllerState(ControllerState):
             controller._sindex = controller._cn_last;
         elif controller._sindex >= 1:
             controller._sindex -= 1
-        
+
         controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod
@@ -131,7 +132,7 @@ class SearchControllerState(ControllerState):
             controller._sindex = 0
         elif controller._sindex < controller._cn_last:
             controller._sindex += 1
-        
+
         controller._swin.show_relevant(controller._relevant, controller._sindex)
 
     @staticmethod

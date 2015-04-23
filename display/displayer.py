@@ -17,11 +17,11 @@ class DisplayWindow(DisplayInterface):
         # 设置版本号
         self._VERSION = 'MyDict V1.0'
         self._window.addstr(self._maxy-1, self._maxx-12, 
-                                self._VERSION, curses.color_pair(1))
+                            self._VERSION, curses.color_pair(1))
 
         # 设置欢迎词和自定义文本
         self._window.addstr(self._WELCOME_Y, self._WELCOME_X, 
-                                self._WELCOME, curses.color_pair(3))
+                            self._WELCOME, curses.color_pair(3))
         
         # 设置欢迎画面
         self._init_pic()
@@ -93,7 +93,6 @@ class DisplayWindow(DisplayInterface):
                 self._window.addstr(pic_y, self._PIC_X, line)
                 pic_y += 1
 
-
     def display_word(self, word):
         """
         展示查询的单词
@@ -126,7 +125,7 @@ class DisplayWindow(DisplayInterface):
         """
         line = '-------------' * 4
         self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X, 
-                                            line, curses.color_pair(1))
+                            line, curses.color_pair(1))
         increment = 1
         for example in examples.split('|'):
             sentence = example.split('#')
@@ -136,7 +135,7 @@ class DisplayWindow(DisplayInterface):
                 en_line_nums = len(en) // (self._maxx-self._EXAMPLES_X) + 1 
                 zh_line_nums = len(zh) // (self._maxx-self._EXAMPLES_X) + 1
                 at_least_lines = self._EXAMPLES_Y + increment + 1 +\
-                        en_line_nums + zh_line_nums
+                    en_line_nums + zh_line_nums
                 if at_least_lines >= self._maxy:
                     break
                 self._window.addstr(self._EXAMPLES_Y+increment, self._EXAMPLES_X, en)
@@ -150,18 +149,15 @@ class DisplayWindow(DisplayInterface):
         查询失败
         """
         self._window.addstr(self._maxy//2, self._maxx//2-14, 
-                '没有找到'+failed_word+'相关解释',
-                curses.color_pair(1))
-
+                            '没有找到'+failed_word+'相关解释',
+                            curses.color_pair(1))
 
     def recover(self):
         self._window.touchwin()
         self._window.refresh()
 
-
     def refresh(self):
         self._window.refresh()
 
-    
     def clear(self):
         self._window.clear()

@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 website = "http://dict.baidu.com/s"
 
+
 def get_meaning(soup):
     """
     解析获取单词解释
@@ -63,9 +64,9 @@ def get_example(soup):
             ...
         ]
     ] 
-    """ 
+    """
     # 规律：需要提取的词在四个左中括号内，即[[[[
-    #       如果[]互相抵消，那么只剩两个[[时表示新的一句话，中文或英文
+    # 如果[]互相抵消，那么只剩两个[[时表示新的一句话，中文或英文
 
     # 从网页中抓取格式化数据
     text = soup.find(name='div', attrs={'id': 'example-box'})
@@ -80,8 +81,8 @@ def get_example(soup):
     # 解析格式化数据，使用上面描述的规律，根据[的数量分析
     left_bracket_nums = 0
     next_word = False
-    quote_flag = 0      #双引号标识
-    example_index = 0   #例句下标，偶数时为英语句子，单数时为中文句子
+    quote_flag = 0  #双引号标识
+    example_index = 0  #例句下标，偶数时为英语句子，单数时为中文句子
     transferred_flag = False  #转义字符标识
     word = str()
     sentence = str()
@@ -136,6 +137,7 @@ def get_example(soup):
 
     return sentence
 
+
 def get_explain_from_web(word):
     """
     Get word explain from baidu.
@@ -158,6 +160,7 @@ def get_explain_from_web(word):
     examples = get_example(soup)
 
     return meanings + '$' + examples
+
 
 if __name__ == '__main__':
     print('----测试从网上爬解释----')

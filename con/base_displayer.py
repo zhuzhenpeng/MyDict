@@ -44,7 +44,6 @@ class DisplayInterface(metaclass=ABCMeta):
         """
         pass
 
-
     @abstractmethod
     def refresh(self):
         """

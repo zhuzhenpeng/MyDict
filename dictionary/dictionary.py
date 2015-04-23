@@ -36,6 +36,6 @@ class Dictionary(DictionaryInterface):
         word = ('hello', )
         conn = sqlite3.connect('./dict.db')
         c = conn.cursor()
-        result = c.execute(self.SEARCH_A_WORD, word).fetchone()
+        c.execute(self.SEARCH_A_WORD, word).fetchone()
         c.close()
         conn.close()
