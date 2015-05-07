@@ -1,15 +1,16 @@
 class Trie:
     """
     字典树
-    每个节点都是{}类型
     """
 
     def __init__(self):
-        self._root = dict()
+        self._root = dict()  # 每个节点都是{}类型
         self._words = set()
 
-
     def insert(self, word):
+        """
+        插入单词，构造词典树
+        """
         self._words.add(word)
         index, node = self._find_last_node(word)
         for char in word[index:]:
@@ -17,10 +18,9 @@ class Trie:
             node[char] = new_node
             node = new_node
 
-    
     def get_relevant(self, prefix):
         """
-        根据前缀获得相关单词
+        根据前缀获得相关单词集并返回
         """
         node = self._find(prefix)
         if node is None:
@@ -32,7 +32,6 @@ class Trie:
             if prefix in self._words:
                 result.insert(0, prefix)
             return result
-
 
     def _find(self, prefix):
         """
@@ -52,7 +51,6 @@ class Trie:
         else:
             return node
 
-
     def _search_recursive(self, node, prefix, result_set):
         """
         从某个节点开始把相关结果放入结果集中
@@ -61,7 +59,6 @@ class Trie:
             word = prefix + item[0]
             result_set.append(word)
             self._search_recursive(item[1], word, result_set)
-
 
     def _find_last_node(self, word):
         node = self._root
@@ -73,7 +70,16 @@ class Trie:
             else:
                 break
             index += 1
-        return (index, node)
+        return index, node
+
+
+def get_trie():
+    # 初始化字典树
+    tree = Trie()
+    with open('./DBGenerate/words', mode='r') as words:
+        for line in words:
+            tree.insert(line.strip())
+    return tree
 
 
 if __name__ == '__main__':

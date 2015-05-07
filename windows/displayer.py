@@ -1,10 +1,15 @@
-from con.base_displayer import DisplayInterface
 import curses
 import math
 import configparser
 
 
-class DisplayWindow(DisplayInterface):
+class DisplayWordWindow():
+    """
+    展示以下内容的窗口：
+    1 英文单词的中文解释
+    2 英文词组的中文解释
+    3 中文单词对应的英文解释(英文单词)
+    """
 
     def __init__(self, window):
         """
@@ -15,7 +20,7 @@ class DisplayWindow(DisplayInterface):
         self._read_conf()
 
         # 设置版本号
-        self._VERSION = 'MyDict V1.0'
+        self._VERSION = 'MyDict V1.9'
         self._window.addstr(self._maxy-1, self._maxx-12, 
                             self._VERSION, curses.color_pair(1))
 
@@ -27,8 +32,7 @@ class DisplayWindow(DisplayInterface):
         self._init_pic()
 
         # 设置单词的坐标
-        self._word_x = math.floor(self._maxx * 0.45)
-        self._word_y = 0
+        self._word_display_y = 0
 
         self._window.refresh()
 
@@ -97,15 +101,14 @@ class DisplayWindow(DisplayInterface):
         """
         展示查询的单词
         """
-        self._window.addstr(self._word_y, 1, word, curses.color_pair(3))
-        self._window.addstr(self._word_y, self._word_x, word, curses.color_pair(3))
-        self._window.addstr(self._word_y, self._maxx-len(word)-1, word, curses.color_pair(3))
+        word_x = math.floor((self._maxx - len(word)) / 2)
+        self._window.addstr(self._word_display_y, word_x, word, curses.color_pair(3))
         self._window.refresh()
 
     def display_meanings(self, meanings):
         """
         展示单词解释
-        每个解释用|分割
+        :meanings:  字符串类型，要求内容用'|'分割
         """
         ms = meanings.split('|')
         y = self._MEANINGS_Y
@@ -121,7 +124,7 @@ class DisplayWindow(DisplayInterface):
     def display_examples(self, examples):
         """
         展示例句
-        每个例句用#分割，例句中的中英文用|分割
+        :examples:  每个例句用'|'分割，例句中的中英文用'#'分割
         """
         line = '-------------' * 4
         self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X, 
@@ -146,18 +149,28 @@ class DisplayWindow(DisplayInterface):
 
     def display_search_failed(self, failed_word):
         """
-        查询失败
+        没有找到单词释义时的输出内容
         """
-        self._window.addstr(self._maxy//2, self._maxx//2-14, 
-                            '没有找到'+failed_word+'相关解释',
-                            curses.color_pair(1))
+        sentence = '没有找到' + failed_word + '相关解释'
+        sentence_x = (self._maxx - len(sentence) - 8) // 2
+        self._window.addstr(self._maxy//2, sentence_x,
+                            sentence, curses.color_pair(1))
 
     def recover(self):
+        """
+        恢复窗口内容
+        """
         self._window.touchwin()
         self._window.refresh()
 
     def refresh(self):
+        """
+        刷新窗口
+        """
         self._window.refresh()
 
     def clear(self):
+        """
+        清空屏幕
+        """
         self._window.clear()

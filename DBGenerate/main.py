@@ -1,10 +1,12 @@
 # -*- coding: utf8 -*-
-from DBGenerate import persistence
-from DBGenerate import webdict
+import persistence
+import webdict
 import time
 from requests.exceptions import RequestException
 from multiprocessing import Pool, Process, Queue
 
+# q为全部查询结果队列，多进程共享
+q = Queue()
 
 # 将结果集中的结果写入数据库(写进程任务)
 def write_result_into_db():
@@ -37,9 +39,6 @@ if __name__ == '__main__':
     with open('words', mode='r') as words_file:
         for word in words_file:
             words.append(word.strip())
-
-    # q为全部查询结果队列，多进程共享
-    q = Queue()
 
     pw = Process(target=write_result_into_db)
     pw.start()
