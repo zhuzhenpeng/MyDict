@@ -21,13 +21,13 @@ class DisplayWordWindow():
 
         # 设置版本号
         self._VERSION = 'MyDict V1.9'
-        self._window.addstr(self._maxy-1, self._maxx-12, 
+        self._window.addstr(self._maxy - 1, self._maxx - 12,
                             self._VERSION, curses.color_pair(1))
 
         # 设置欢迎词和自定义文本
-        self._window.addstr(self._WELCOME_Y, self._WELCOME_X, 
+        self._window.addstr(self._WELCOME_Y, self._WELCOME_X,
                             self._WELCOME, curses.color_pair(3))
-        
+
         # 设置欢迎画面
         self._init_pic()
 
@@ -69,7 +69,7 @@ class DisplayWordWindow():
             self._MEANINGS_Y = 2
 
         self._EXAMPLES_X = int(config['Word']['examples_x'])
-        self._EXAMPLES_Y = 0 
+        self._EXAMPLES_Y = 0
         if self._EXAMPLES_X == 0:
             self._EXAMPLES_X = 1
 
@@ -97,7 +97,7 @@ class DisplayWordWindow():
                 self._window.addstr(pic_y, self._PIC_X, line)
                 pic_y += 1
 
-    def display_word(self, word):
+    def _display_word(self, word):
         """
         展示查询的单词
         """
@@ -105,37 +105,32 @@ class DisplayWordWindow():
         self._window.addstr(self._word_display_y, word_x, word, curses.color_pair(3))
         self._window.refresh()
 
-    def display_meanings(self, meanings):
+    def _display_meanings(self, meanings):
         """
         展示单词解释
-        :meanings:  字符串类型，要求内容用'|'分割
+        :param meanings:  字符串列表
         """
-        ms = meanings.split('|')
         y = self._MEANINGS_Y
 
         increment = 0
-        for m in ms:
+        for m in meanings:
             self._window.addstr(y+increment, self._MEANINGS_X, m)
             increment += 2
 
         # 设置例句的纵坐标
         self._EXAMPLES_Y = y + increment
 
-    def display_examples(self, examples):
+    def _display_examples(self, examples):
         """
         展示例句
-        :examples:  每个例句用'|'分割，例句中的中英文用'#'分割
+        :param examples:  二元组列表,（英文句子, 中文句子）
         """
         line = '-------------' * 4
-        self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X, 
+        self._window.addstr(self._EXAMPLES_Y, self._EXAMPLES_X,
                             line, curses.color_pair(1))
         increment = 1
-        for example in examples.split('|'):
-            sentence = example.split('#')
-            if len(sentence) > 1:
-                en = sentence[0]
-                zh = sentence[1]
-                en_line_nums = len(en) // (self._maxx-self._EXAMPLES_X) + 1 
+        for en, zh in examples:
+            en_line_nums = len(en) // (self._maxx - self._EXAMPLES_X) + 1
                 zh_line_nums = len(zh) // (self._maxx-self._EXAMPLES_X) + 1
                 at_least_lines = self._EXAMPLES_Y + increment + 1 +\
                     en_line_nums + zh_line_nums
@@ -147,7 +142,7 @@ class DisplayWordWindow():
                 increment += zh_line_nums
                 increment += 1
 
-    def display_search_failed(self, failed_word):
+    def _display_search_failed(self, failed_word):
         """
         没有找到单词释义时的输出内容
         """
@@ -155,6 +150,17 @@ class DisplayWordWindow():
         sentence_x = (self._maxx - len(sentence) - 8) // 2
         self._window.addstr(self._maxy//2, sentence_x,
                             sentence, curses.color_pair(1))
+
+    def display_en_word(self, explained_word):
+        """
+        展示英文单词的查询结果
+        """
+        self._display_word(explained_word.word)
+        if explained_word.is_valid():
+            self._display_meanings(explained_word.explanations)
+            self._display_examples(explained_word.zh_example_sentence)
+        else:
+            self._display_search_failed(explained_word.word)
 
     def recover(self):
         """

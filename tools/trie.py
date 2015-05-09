@@ -74,7 +74,10 @@ class Trie:
 
 
 def get_trie():
-    # 初始化字典树
+    """
+    生成词典树
+    :return:词典树实例
+    """
     tree = Trie()
     with open('./DBGenerate/words', mode='r') as words:
         for line in words:

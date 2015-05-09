@@ -28,7 +28,7 @@ def init_curses():
 
 def main(screen):
     # 设置工作目录为当前文件所在的目录
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # 初始化展示窗口
     display_y, display_x = screen.getmaxyx()

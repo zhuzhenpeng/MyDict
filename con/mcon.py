@@ -1,5 +1,6 @@
 # coding=utf-8
 import curses
+
 from con.state import DisplayControllerState
 
 
