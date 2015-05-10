@@ -1,3 +1,15 @@
+def get_trie():
+    """
+    生成词典树
+    :return:词典树实例
+    """
+    trie = Trie()
+    with open('./local_words', mode='r') as words:
+        for word in words:
+            trie.insert(word.strip())
+    return trie
+
+
 class Trie:
     """
     字典树
@@ -73,21 +85,9 @@ class Trie:
         return index, node
 
 
-def get_trie():
-    """
-    生成词典树
-    :return:词典树实例
-    """
-    tree = Trie()
-    with open('./DBGenerate/words', mode='r') as words:
-        for line in words:
-            tree.insert(line.strip())
-    return tree
-
-
 if __name__ == '__main__':
     tree = Trie()
-    with open('../DBGenerate/words', mode='r') as words:
+    with open('./local_words', mode='r') as words:
         for line in words:
             tree.insert(line.strip())
     while True:

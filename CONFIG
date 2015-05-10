@@ -23,4 +23,8 @@ meanings_y = 0
 # 单词例句
 examples_x = 0
 
+[BaiduAPI]
+# 词典的API Key
+api_key = 63GBPoh1TGhPY3oft4f6ppR8
+
 

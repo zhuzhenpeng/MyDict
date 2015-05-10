@@ -67,7 +67,12 @@ class SearchControllerState(ControllerState):
         查询单词，隐藏查询框
         切换到展示状态并展示单词内容
         """
-        explained_word = controller.local_dict.get_meaning(controller.current_word)
+        # 有无relevant_words表示了本地数据库有无结果
+        if controller.relevant_words:
+            explained_word = controller.local_dict.get_meaning(controller.current_word)
+        else:
+            explained_word = controller.online_dict.get_en_word_meaning(controller.current_word)
+
         controller.display_window.clear()
         controller.display_window.display_en_word(explained_word)
         controller.change_to_state(DisplayControllerState)

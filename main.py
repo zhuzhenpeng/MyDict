@@ -1,13 +1,10 @@
 import curses
 import math
-import threading
 import os
 
-from tools import trie
 from con.mcon import MainController
 from windows.displayer import DisplayWordWindow
 from windows.searcher import SearchWindow
-from tools.dictionary import LocalEnToZhDictionary
 
 
 def init_curses():
@@ -30,6 +27,11 @@ def main(screen):
     # 设置工作目录为当前文件所在的目录
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+    # 设置主窗口属性
+    screen.keypad(True)
+    screen.border('|', '|', '-', '-', '+', '+', '+', '+')
+    screen.refresh()
+
     # 初始化展示窗口
     display_y, display_x = screen.getmaxyx()
     display_win = DisplayWordWindow(curses.newwin(
@@ -42,19 +44,9 @@ def main(screen):
         curses.newwin(3, search_x, 0, 0),
         curses.newwin(search_y - 3, search_x, 3, 0))
 
-    # 初始化本地字典
-    local_dict = LocalEnToZhDictionary()
-
-    # 初始化字典树
-    tree = trie.get_trie()
-
     # 初始化控制器
     controller = MainController(screen, display_win,
-                                search_win, local_dict, tree)
-
-    # 预热数据库
-    db_thread = threading.Thread(target=local_dict.ready)
-    db_thread.start()
+                                search_win)
 
     # 控制器进入事件循环状态
     controller.work()

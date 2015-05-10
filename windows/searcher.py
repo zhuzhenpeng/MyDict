@@ -25,6 +25,12 @@ class SearchWindow():
                                      '+', '+', '+', '+')
         self.refresh()
 
+    def max_word_width(self):
+        """
+        返回窗口可以显示英文单词的宽度
+        """
+        return self._rmaxx - 4
+
     def recover(self):
         """
         恢复窗口

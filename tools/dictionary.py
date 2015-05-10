@@ -1,6 +1,8 @@
 import sqlite3
+import threading
 
-from elements.words import EnglishWord
+from elements.words import EnglishWord, ChineseWord
+from tools.baidu.dict_api import BaiduDict
 
 
 class LocalEnToZhDictionary():
@@ -12,6 +14,8 @@ class LocalEnToZhDictionary():
         self.SEARCH_A_WORD = \
             'SELECT meanings, examples FROM words WHERE word=?'
         self.__conn = sqlite3.connect('./dict.db')
+        db_thread = threading.Thread(target=self._ready)
+        db_thread.start()
 
     def __del__(self):
         self.__conn.close()
@@ -21,7 +25,7 @@ class LocalEnToZhDictionary():
         """
         :param query_word: 查询的单词
         :param query_result: 数据库查询结果
-        :return: 完整的英语单词词条
+        :return:elements.words.EnglishWord
         """
         explained_word = EnglishWord(query_word)
         meanings, examples = query_result
@@ -43,10 +47,10 @@ class LocalEnToZhDictionary():
     def get_meaning(self, raw_word):
         """
         获取单词释义
-        :param raw_word: 单词，str类型，不保证输入安全
-        :return: 英文单词对象
+        :param raw_word: 英文单词,要求str类型
+        :return:elements.words.EnglishWord
         """
-        stripped_word_tuple = (raw_word.strip().lower(), )
+        stripped_word_tuple = (raw_word.strip(), )
         cursor = self.__conn.cursor()
         query_result = cursor.execute(self.SEARCH_A_WORD, stripped_word_tuple).fetchone()
         # 数据库返回二元组,格式为
@@ -58,7 +62,7 @@ class LocalEnToZhDictionary():
         explained_word = self._make_en_word(stripped_word_tuple[0], query_result)
         return explained_word
 
-    def ready(self):
+    def _ready(self):
         """
         通过发送一条指令预热数据库
         """
@@ -68,6 +72,56 @@ class LocalEnToZhDictionary():
         cur.execute(self.SEARCH_A_WORD, search_word).fetchone()
         cur.close()
         connection.close()
+
+
+class OnlineDictionary():
+    """
+    在线词典，通过网络API实时返回解释
+    """
+
+    def __init__(self):
+        self.dictionary = BaiduDict()
+
+    def get_en_word_meaning(self, en_word):
+        """
+        在线获取英文单词解释
+        :return:elements.words.EnglishWord
+        """
+        online_query_result = self.dictionary.en_to_zh(en_word)
+        return self._parse_baidu_en_result(en_word, online_query_result)
+
+    def get_zh_word_meaning(self, zh_word):
+        online_query_result = self.dictionary.zh_to_en(zh_word)
+        return self._parse_baidu_zh_result(zh_word, online_query_result)
+
+    @staticmethod
+    def _parse_baidu_en_result(en_word, baidu_query_result):
+        """
+        解析百度返回的json数据
+        :return:elements.words.EnglishWord
+        """
+        explained_word = EnglishWord(en_word)
+        if baidu_query_result['data']:
+            for items in baidu_query_result['data']['symbols'][0]['parts']:
+                parts = items['part']
+                means = items['means']
+                explanation = parts + ' '.join(means)
+                explained_word.add_explanation(explanation)
+        return explained_word
+
+    @staticmethod
+    def _parse_baidu_zh_result(zh_word, baidu_quety_result):
+        """
+        解析百度返回的json数据
+        :return:elements.words.ChineseWord
+        """
+        explained_word = ChineseWord(zh_word)
+        if baidu_quety_result['data']:
+            for items in baidu_quety_result['data']['symbols'][0]['parts']:
+                means = items['means']
+                for explanation in means:
+                    explained_word.add_explanation(explanation)
+        return explained_word
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ class Word:
 
 class EnglishWord(Word):
     """
-    英文单词
+    英文单词、词组
     包括单词本身，中文解释，中文例句
     """
 
@@ -36,20 +36,20 @@ class EnglishWord(Word):
         self.zh_example_sentence.append(sentence)
 
 
-class EnglishPhrase(Word):
-    """
-    英文词组
-    包含词组本身，词组解释
-    """
-
-    def __init__(self, phrase):
-        super().__init__(phrase)
-
-    def __getattr__(self, item):
-        if item == 'phrase':
-            return self.content
-        else:
-            return None
+# class EnglishPhrase(Word):
+#     """
+#     英文词组
+#     包含词组本身，词组解释
+#     """
+#
+#     def __init__(self, phrase):
+#         super().__init__(phrase)
+#
+#     def __getattr__(self, item):
+#         if item == 'phrase':
+#             return self.content
+#         else:
+#             return None
 
 
 class ChineseWord(Word):
