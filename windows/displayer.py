@@ -114,7 +114,7 @@ class DisplayWordWindow():
 
         increment = 0
         for m in meanings:
-            self._window.addstr(y+increment, self._MEANINGS_X, m)
+            self._window.addstr(y + increment, self._MEANINGS_X, m)
             increment += 2
 
         # 设置例句的纵坐标
@@ -131,16 +131,15 @@ class DisplayWordWindow():
         increment = 1
         for en, zh in examples:
             en_line_nums = len(en) // (self._maxx - self._EXAMPLES_X) + 1
-                zh_line_nums = len(zh) // (self._maxx-self._EXAMPLES_X) + 1
-                at_least_lines = self._EXAMPLES_Y + increment + 1 +\
-                    en_line_nums + zh_line_nums
-                if at_least_lines >= self._maxy:
-                    break
-                self._window.addstr(self._EXAMPLES_Y+increment, self._EXAMPLES_X, en)
-                increment += en_line_nums
-                self._window.addstr(self._EXAMPLES_Y+increment, self._EXAMPLES_X, zh)
-                increment += zh_line_nums
-                increment += 1
+            zh_line_nums = len(zh) // (self._maxx - self._EXAMPLES_X) + 1
+            at_least_lines = self._EXAMPLES_Y + increment + 1 + en_line_nums + zh_line_nums
+            if at_least_lines >= self._maxy:
+                break
+            self._window.addstr(self._EXAMPLES_Y + increment, self._EXAMPLES_X, en)
+            increment += en_line_nums
+            self._window.addstr(self._EXAMPLES_Y + increment, self._EXAMPLES_X, zh)
+            increment += zh_line_nums
+            increment += 1
 
     def _display_search_failed(self, failed_word):
         """
@@ -148,7 +147,7 @@ class DisplayWordWindow():
         """
         sentence = '没有找到' + failed_word + '相关解释'
         sentence_x = (self._maxx - len(sentence) - 8) // 2
-        self._window.addstr(self._maxy//2, sentence_x,
+        self._window.addstr(self._maxy // 2, sentence_x,
                             sentence, curses.color_pair(1))
 
     def display_en_word(self, explained_word):
@@ -174,6 +173,7 @@ class DisplayWordWindow():
         刷新窗口
         """
         self._window.refresh()
+
 
     def clear(self):
         """
