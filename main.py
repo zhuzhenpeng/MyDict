@@ -1,6 +1,7 @@
 import curses
 import math
 import os
+import locale
 
 from con.mcon import MainController
 from windows.displayer import DisplayWordWindow
@@ -28,7 +29,7 @@ def main(screen):
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # 设置主窗口属性
-    screen.keypad(True)
+    # screen.keypad(True)
     screen.border('|', '|', '-', '-', '+', '+', '+', '+')
     screen.refresh()
 
@@ -54,6 +55,8 @@ def main(screen):
 
 if __name__ == '__main__':
     main_screen = curses.initscr()
+    locale.setlocale(locale.LC_ALL, '')
+    code = locale.getpreferredencoding('utf-8')
     try:
         init_curses()
         main(main_screen)

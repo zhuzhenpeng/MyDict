@@ -87,12 +87,20 @@ class OnlineDictionary():
         在线获取英文单词解释
         :return:elements.words.EnglishWord
         """
-        online_query_result = self.dictionary.en_to_zh(en_word)
-        return self._parse_baidu_en_result(en_word, online_query_result)
+        try:
+            online_query_result = self.dictionary.en_to_zh(en_word)
+        except:
+            return EnglishWord(en_word)
+        else:
+            return self._parse_baidu_en_result(en_word, online_query_result)
 
     def get_zh_word_meaning(self, zh_word):
-        online_query_result = self.dictionary.zh_to_en(zh_word)
-        return self._parse_baidu_zh_result(zh_word, online_query_result)
+        try:
+            online_query_result = self.dictionary.zh_to_en(zh_word)
+        except:
+            return ChineseWord(zh_word)
+        else:
+            return self._parse_baidu_zh_result(zh_word, online_query_result)
 
     @staticmethod
     def _parse_baidu_en_result(en_word, baidu_query_result):

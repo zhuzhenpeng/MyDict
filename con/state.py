@@ -1,4 +1,7 @@
 # coding=utf-8
+import re
+
+
 class ControllerState:
     """
     控制器管理状态的基类
@@ -21,7 +24,7 @@ class ControllerState:
         raise NotImplementedError()
 
     @staticmethod
-    def c_g(controller):
+    def esc(controller):
         raise NotImplementedError()
 
     @staticmethod
@@ -42,6 +45,8 @@ class SearchControllerState(ControllerState):
     查询状态下的各种操作处理
     """
 
+    en_chars = r'[a-zA-Z]'
+
     @staticmethod
     def _update_relevant(controller):
         """
@@ -52,6 +57,19 @@ class SearchControllerState(ControllerState):
         controller.set_relevant(controller.trie.get_relevant(controller.current_word))
         controller.cn_last = controller.search_window.show_relevant(controller.relevant_words, 0)
         controller.selected_index = 0
+
+    @staticmethod
+    def _search_en_word(controller):
+        if controller.relevant_words:
+            explained_word = controller.local_dict.get_meaning(controller.current_word)
+        else:
+            explained_word = controller.online_dict.get_en_word_meaning(controller.current_word)
+        return explained_word
+
+    @staticmethod
+    def _search_zh_word(controller):
+        explained_word = controller.online_dict.get_zh_word_meaning(controller.current_word)
+        return explained_word
 
     @staticmethod
     def alpha(controller, ch):
@@ -68,13 +86,17 @@ class SearchControllerState(ControllerState):
         切换到展示状态并展示单词内容
         """
         # 有无relevant_words表示了本地数据库有无结果
-        if controller.relevant_words:
-            explained_word = controller.local_dict.get_meaning(controller.current_word)
+        has_en_char = re.search(SearchControllerState.en_chars, controller.current_word)
+        if has_en_char:
+            explained_word = SearchControllerState._search_en_word(controller)
         else:
-            explained_word = controller.online_dict.get_en_word_meaning(controller.current_word)
+            explained_word = SearchControllerState._search_zh_word(controller)
 
         controller.display_window.clear()
-        controller.display_window.display_en_word(explained_word)
+        if has_en_char:
+            controller.display_window.display_en_word(explained_word)
+        else:
+            controller.display_window.display_zh_word(explained_word)
         controller.change_to_state(DisplayControllerState)
         controller.display_window.refresh()
         # 清空单词
@@ -102,7 +124,7 @@ class SearchControllerState(ControllerState):
             SearchControllerState._update_relevant(controller)
 
     @staticmethod
-    def c_g(controller):
+    def esc(controller):
         """
         隐藏查询窗口，删除已输入的单词
         """
@@ -170,7 +192,7 @@ class DisplayControllerState(ControllerState):
         pass
 
     @staticmethod
-    def c_g(controller):
+    def esc(controller):
         """
         退出程序
         """

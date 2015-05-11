@@ -1,6 +1,4 @@
 # coding=utf-8
-import curses
-
 from con.state import DisplayControllerState
 from tools import trie
 from tools.dictionary import LocalEnToZhDictionary, OnlineDictionary
@@ -50,41 +48,43 @@ class MainController:
         """
         while True:
             try:
-                raw_ch = self.main_window.getch()
+                character = self.main_window.get_wch()
+                ch_num = ord(character)
 
                 # 输入字母或空格
-                if (65 <= raw_ch <= 90) or (97 <= raw_ch <= 122) \
-                        or (raw_ch == 32):
+                if (65 <= ch_num <= 90 or 97 <= ch_num <= 122) \
+                        or (ch_num == 32) \
+                        or (0x4e00 <= ch_num <= 0x9fa5):
                     # 忽略首字符时空格的输入
-                    if raw_ch == 32 and len(self.current_word) == 0:
+                    if ch_num == 32 and len(self.current_word) == 0:
                         continue
                     if len(self.current_word) < self.word_max_length:
-                        self.current_word += chr(raw_ch)
-                    self.state.alpha(self, raw_ch)
+                        self.current_word += character
+                    self.state.alpha(self, ch_num)
 
-                # 输入C-g
-                if raw_ch == 7:
-                    self.state.c_g(self)
+                # 输入Esc
+                if ch_num == 27:
+                    self.state.esc(self)
 
                 # 输入BackSpace
-                if raw_ch == curses.KEY_BACKSPACE:
+                if ch_num == 127:
                     self.current_word = self.current_word[:-1]
                     self.state.backspace(self)
 
                 # 输入Enter
-                if raw_ch == ord('\n'):
+                if ch_num == 10:
                     self.state.enter(self)
 
                 # 输入C-n
-                if raw_ch == 14:
+                if ch_num == 14:
                     self.state.c_n(self)
 
                 # 输入C-p
-                if raw_ch == 16:
+                if ch_num == 16:
                     self.state.c_p(self)
 
                 # 输入Tab
-                if raw_ch == ord('\t'):
+                if ch_num == 9:
                     self.state.tab(self)
 
             except StopIteration:

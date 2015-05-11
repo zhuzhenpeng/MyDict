@@ -145,21 +145,33 @@ class DisplayWordWindow():
         """
         没有找到单词释义时的输出内容
         """
-        sentence = '没有找到' + failed_word + '相关解释'
+        sentence = '没有找到 ' + failed_word + ' 相关解释'
         sentence_x = (self._maxx - len(sentence) - 8) // 2
         self._window.addstr(self._maxy // 2, sentence_x,
                             sentence, curses.color_pair(1))
 
-    def display_en_word(self, explained_word):
+    def display_en_word(self, explained_en_word):
         """
         展示英文单词的查询结果
+        :param explained_en_word:elements.words.EnglishWord
         """
-        self._display_word(explained_word.word)
-        if explained_word.is_valid():
-            self._display_meanings(explained_word.explanations)
-            self._display_examples(explained_word.zh_example_sentence)
+        self._display_word(explained_en_word.word)
+        if explained_en_word.is_valid():
+            self._display_meanings(explained_en_word.explanations)
+            self._display_examples(explained_en_word.zh_example_sentence)
         else:
-            self._display_search_failed(explained_word.word)
+            self._display_search_failed(explained_en_word.word)
+
+    def display_zh_word(self, explained_zh_word):
+        """
+        展示中文单词的查询结果
+        :param explained_zh_word:elements.words.ChineseWord
+        """
+        self._display_word(explained_zh_word.word)
+        if explained_zh_word.is_valid():
+            self._display_meanings(explained_zh_word.explanations)
+        else:
+            self._display_search_failed(explained_zh_word.word)
 
     def recover(self):
         """
