@@ -9,35 +9,39 @@ class ControllerState:
 
     @staticmethod
     def alpha(controller, ch):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def enter(controller):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def backspace(controller):
-        raise NotImplementedError()
+        pass
+
+    @staticmethod
+    def c_w(controller):
+        pass
 
     @staticmethod
     def tab(controller):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def esc(controller):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def c_p(controller):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def c_n(controller):
-        raise NotImplementedError()
+        pass
 
     @staticmethod
     def recover(controller):
-        raise NotImplementedError()
+        pass
 
 
 class SearchControllerState(ControllerState):
@@ -87,15 +91,12 @@ class SearchControllerState(ControllerState):
         """
         # 有无relevant_words表示了本地数据库有无结果
         has_en_char = re.search(SearchControllerState.en_chars, controller.current_word)
-        if has_en_char:
-            explained_word = SearchControllerState._search_en_word(controller)
-        else:
-            explained_word = SearchControllerState._search_zh_word(controller)
-
         controller.display_window.clear()
         if has_en_char:
+            explained_word = SearchControllerState._search_en_word(controller)
             controller.display_window.display_en_word(explained_word)
         else:
+            explained_word = SearchControllerState._search_zh_word(controller)
             controller.display_window.display_zh_word(explained_word)
         controller.change_to_state(DisplayControllerState)
         controller.display_window.refresh()
@@ -107,11 +108,20 @@ class SearchControllerState(ControllerState):
         """
         删除最后一个字母，刷新字符串
         """
+        controller.current_word = controller.current_word[:-1]
         if len(controller.current_word) == 0:
             controller.change_to_state(DisplayControllerState)
         else:
             controller.search_window.show_input_word(controller.current_word)
             SearchControllerState._update_relevant(controller)
+
+    @staticmethod
+    def c_w(controller):
+        """
+        删除全部输入
+        """
+        controller.current_word = str()
+        controller.change_to_state(DisplayControllerState)
 
     @staticmethod
     def tab(controller):
@@ -180,31 +190,11 @@ class DisplayControllerState(ControllerState):
         controller.state.alpha(controller, ch)
 
     @staticmethod
-    def enter(controller):
-        pass
-
-    @staticmethod
-    def backspace(controller):
-        pass
-
-    @staticmethod
-    def tab(controller):
-        pass
-
-    @staticmethod
     def esc(controller):
         """
         退出程序
         """
         raise StopIteration()
-
-    @staticmethod
-    def c_p(controller):
-        pass
-
-    @staticmethod
-    def c_n(controller):
-        pass
 
     @staticmethod
     def recover(controller):

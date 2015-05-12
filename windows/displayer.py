@@ -186,7 +186,6 @@ class DisplayWordWindow():
         """
         self._window.refresh()
 
-
     def clear(self):
         """
         清空屏幕

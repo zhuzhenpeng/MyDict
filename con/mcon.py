@@ -42,6 +42,18 @@ class MainController:
         # 在线词典
         self.online_dict = OnlineDictionary()
 
+    @staticmethod
+    def _is_word_input(char_num):
+        """
+        判断输入字符是否为英文、中文或空格
+        :param char_num: 字符对应的unicode码
+        """
+        if (65 <= char_num <= 90 or 97 <= char_num <= 122) \
+                or (char_num == 32) or (0x4e00 <= char_num <= 0x9fa5):
+            return True
+        else:
+            return False
+
     def work(self):
         """
         进入工作循环，捕捉键盘输入
@@ -51,10 +63,7 @@ class MainController:
                 character = self.main_window.get_wch()
                 ch_num = ord(character)
 
-                # 输入字母或空格
-                if (65 <= ch_num <= 90 or 97 <= ch_num <= 122) \
-                        or (ch_num == 32) \
-                        or (0x4e00 <= ch_num <= 0x9fa5):
+                if self._is_word_input(ch_num):
                     # 忽略首字符时空格的输入
                     if ch_num == 32 and len(self.current_word) == 0:
                         continue
@@ -66,10 +75,13 @@ class MainController:
                 if ch_num == 27:
                     self.state.esc(self)
 
-                # 输入BackSpace
+                # 输入BackSpace,相当于OS X中的delete
                 if ch_num == 127:
-                    self.current_word = self.current_word[:-1]
                     self.state.backspace(self)
+
+                # 输入C-w
+                if ch_num == 23:
+                    self.state.c_w(self)
 
                 # 输入Enter
                 if ch_num == 10:
