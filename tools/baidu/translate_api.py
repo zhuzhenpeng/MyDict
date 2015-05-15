@@ -21,7 +21,7 @@ class BaiduTranslator:
 
     def _get_api_key(self):
         config = configparser.ConfigParser()
-        config.read('CONFIG')
+        config.read('CONFIG', encoding='utf-8')
         self._CLIENT_ID = config['BaiduAPI']['api_key']
 
     def translate(self, content):
@@ -39,8 +39,20 @@ class BaiduTranslator:
 
 
 if __name__ == '__main__':
+
+    def parse_result(result):
+        print(result['trans_result'][0]['dst'])
+
     translator = BaiduTranslator()
     result1 = translator.translate('今天天气很好')
     print(result1)
+    parse_result(result1)
     result2 = translator.translate('I love you')
     print(result2)
+    parse_result(result2)
+    result3 = translator.translate('sdfsdfasdfasf')
+    print(result3)
+    parse_result(result3)
+    result4 = translator.translate('士大夫士大夫就是地方你说的')
+    print(result4)
+    parse_result(result4)

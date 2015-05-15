@@ -22,7 +22,7 @@ class BaiduDict:
 
     def _get_api_key(self):
         config = configparser.ConfigParser()
-        config.read('CONFIG')
+        config.read('CONFIG', encoding='utf-8')
         self._CLIENT_ID = config['BaiduAPI']['api_key']
 
     def _query(self, query_content, from_lan, to_lan):

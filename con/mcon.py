@@ -1,7 +1,9 @@
 # coding=utf-8
-from con.state import DisplayControllerState
+from con.state import WordDisplay
 from tools import trie
 from tools.dictionary import LocalEnToZhDictionary, OnlineDictionary
+import string
+from tools.translator import OnlineTranslator
 
 
 class MainController:
@@ -10,24 +12,25 @@ class MainController:
     调用model处理输入，刷新view
     """
 
-    def __init__(self, main_win, dis_win, sch_win):
+    def __init__(self, main_win, wm_win, sch_win, tran_win):
         """
         :param main_win:curses初始化时产生的窗口
-        :param dis_win:查询结果展示窗口
+        :param wm_win:查询结果展示窗口
         :param sch_win:搜索窗口
         """
         self.main_window = main_win
-        self.display_window = dis_win
+        self.word_meanings_window = wm_win
         self.search_window = sch_win
+        self.translation_window = tran_win
 
         # 初始化状态
-        self.state = DisplayControllerState
-        self.change_to_state(DisplayControllerState)
+        self.state = WordDisplay
+        self.change_to_state(WordDisplay)
 
         # 词典树
         self.trie = trie.get_trie()
         # 当前输入单词
-        self.current_word = str()
+        self.input_word = str()
         # 当前输入单词最大长度限制
         self.word_max_length = sch_win.max_word_width()
         # 当前候选单词集合
@@ -37,10 +40,21 @@ class MainController:
         # 备选单词的显示出来的数量-1，用于c-n的下界判断
         self.cn_last = 0
 
+        # 待翻译的句子
+        self.input_sentence = str()
+
         # 本地词典
         self.local_dict = LocalEnToZhDictionary()
         # 在线词典
         self.online_dict = OnlineDictionary()
+
+        # 在线翻译工具
+        self.translator = OnlineTranslator()
+
+        # 中文符号的unicode
+        self.zh_punctuations = {
+            '，', '。', '？', '！', '；', '、', '“', '‘', '【', '】', '（', '）', '《', '》', '￥'
+        }
 
     @staticmethod
     def _is_word_input(char_num):
@@ -54,6 +68,14 @@ class MainController:
         else:
             return False
 
+    def _is_punctuation_input(self, p):
+        """
+        判断输入是否是标点符号符号
+        :param p: 标点符号对应的unicode码
+        :return:
+        """
+        return chr(p) in string.punctuation or p in self.zh_punctuations
+
     def work(self):
         """
         进入工作循环，捕捉键盘输入
@@ -63,25 +85,25 @@ class MainController:
                 character = self.main_window.get_wch()
                 ch_num = ord(character)
 
+                # 字符输入
                 if self._is_word_input(ch_num):
-                    # 忽略首字符时空格的输入
-                    if ch_num == 32 and len(self.current_word) == 0:
-                        continue
-                    if len(self.current_word) < self.word_max_length:
-                        self.current_word += character
-                    self.state.alpha(self, ch_num)
+                    self.state.alpha(self, character)
+
+                # 符号输入
+                if self._is_punctuation_input(ch_num):
+                    self.state.punctuation(self, character)
 
                 # 输入Esc
                 if ch_num == 27:
                     self.state.esc(self)
 
-                # 输入BackSpace,相当于OS X中的delete
+                # 输入BackSpace,也相当于OS X中的delete
                 if ch_num == 127:
                     self.state.backspace(self)
 
-                # 输入C-w
-                if ch_num == 23:
-                    self.state.c_w(self)
+                # 输入C-l
+                if ch_num == 12:
+                    self.state.c_l(self)
 
                 # 输入Enter
                 if ch_num == 10:
@@ -99,6 +121,10 @@ class MainController:
                 if ch_num == 9:
                     self.state.tab(self)
 
+                # 输入C-k
+                if ch_num == 11:
+                    self.state.c_k(self)
+
             except StopIteration:
                 break
 
@@ -110,7 +136,7 @@ class MainController:
         self.state = state
         self.state.recover(self)
 
-    def fix(self):
+    def fix_background(self):
         """
         刷新self.main_window,修复边框
         """

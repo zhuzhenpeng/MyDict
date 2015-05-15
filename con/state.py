@@ -12,6 +12,10 @@ class ControllerState:
         pass
 
     @staticmethod
+    def punctuation(controller, p):
+        pass
+
+    @staticmethod
     def enter(controller):
         pass
 
@@ -20,7 +24,7 @@ class ControllerState:
         pass
 
     @staticmethod
-    def c_w(controller):
+    def c_l(controller):
         pass
 
     @staticmethod
@@ -41,10 +45,14 @@ class ControllerState:
 
     @staticmethod
     def recover(controller):
+        raise NotImplementedError
+
+    @staticmethod
+    def c_k(controller):
         pass
 
 
-class SearchControllerState(ControllerState):
+class WordInput(ControllerState):
     """
     查询状态下的各种操作处理
     """
@@ -58,21 +66,21 @@ class SearchControllerState(ControllerState):
         根据补全单词更新显示
         更新选中单词的下标
         """
-        controller.set_relevant(controller.trie.get_relevant(controller.current_word))
+        controller.set_relevant(controller.trie.get_relevant(controller.input_word))
         controller.cn_last = controller.search_window.show_relevant(controller.relevant_words, 0)
         controller.selected_index = 0
 
     @staticmethod
     def _search_en_word(controller):
-        if controller.relevant_words:
-            explained_word = controller.local_dict.get_meaning(controller.current_word)
+        if controller.relevant_words and controller.relevant_words[0] == controller.input_word:
+            explained_word = controller.local_dict.get_meaning(controller.input_word)
         else:
-            explained_word = controller.online_dict.get_en_word_meaning(controller.current_word)
+            explained_word = controller.online_dict.get_en_word_meaning(controller.input_word)
         return explained_word
 
     @staticmethod
     def _search_zh_word(controller):
-        explained_word = controller.online_dict.get_zh_word_meaning(controller.current_word)
+        explained_word = controller.online_dict.get_zh_word_meaning(controller.input_word)
         return explained_word
 
     @staticmethod
@@ -80,8 +88,14 @@ class SearchControllerState(ControllerState):
         """
         输入字母时刷新字符串
         """
-        controller.search_window.show_input_word(controller.current_word)
-        SearchControllerState._update_relevant(controller)
+        # 忽略首字符时空格的输入
+        if ch == ' ' and len(controller.input_word) == 0:
+            return
+        # 保证输入长度合法
+        if len(controller.input_word) < controller.word_max_length:
+            controller.input_word += ch
+        controller.search_window.show_input_word(controller.input_word)
+        WordInput._update_relevant(controller)
 
     @staticmethod
     def enter(controller):
@@ -89,39 +103,37 @@ class SearchControllerState(ControllerState):
         查询单词，隐藏查询框
         切换到展示状态并展示单词内容
         """
-        # 有无relevant_words表示了本地数据库有无结果
-        has_en_char = re.search(SearchControllerState.en_chars, controller.current_word)
-        controller.display_window.clear()
+        has_en_char = re.search(WordInput.en_chars, controller.input_word)
+        controller.word_meanings_window.clear()
         if has_en_char:
-            explained_word = SearchControllerState._search_en_word(controller)
-            controller.display_window.display_en_word(explained_word)
+            explained_word = WordInput._search_en_word(controller)
+            controller.word_meanings_window.display_en_word(explained_word)
         else:
-            explained_word = SearchControllerState._search_zh_word(controller)
-            controller.display_window.display_zh_word(explained_word)
-        controller.change_to_state(DisplayControllerState)
-        controller.display_window.refresh()
+            explained_word = WordInput._search_zh_word(controller)
+            controller.word_meanings_window.display_zh_word(explained_word)
         # 清空单词
-        controller.current_word = str()
+        controller.input_word = str()
+        controller.change_to_state(WordDisplay)
 
     @staticmethod
     def backspace(controller):
         """
         删除最后一个字母，刷新字符串
         """
-        controller.current_word = controller.current_word[:-1]
-        if len(controller.current_word) == 0:
-            controller.change_to_state(DisplayControllerState)
+        controller.input_word = controller.input_word[:-1]
+        if len(controller.input_word) == 0:
+            controller.change_to_state(WordDisplay)
         else:
-            controller.search_window.show_input_word(controller.current_word)
-            SearchControllerState._update_relevant(controller)
+            controller.search_window.show_input_word(controller.input_word)
+            WordInput._update_relevant(controller)
 
     @staticmethod
-    def c_w(controller):
+    def c_l(controller):
         """
         删除全部输入
         """
-        controller.current_word = str()
-        controller.change_to_state(DisplayControllerState)
+        controller.input_word = str()
+        controller.change_to_state(WordDisplay)
 
     @staticmethod
     def tab(controller):
@@ -129,18 +141,17 @@ class SearchControllerState(ControllerState):
         通过当前高亮的单词补全输入单词
         """
         if len(controller.relevant_words) != 0:
-            controller.current_word = controller.relevant_words[controller.selected_index]
-            controller.search_window.show_input_word(controller.current_word)
-            SearchControllerState._update_relevant(controller)
+            controller.input_word = controller.relevant_words[controller.selected_index]
+            controller.search_window.show_input_word(controller.input_word)
+            WordInput._update_relevant(controller)
 
     @staticmethod
     def esc(controller):
         """
         隐藏查询窗口，删除已输入的单词
         """
-        controller.current_word = str()
-        controller.change_to_state(DisplayControllerState)
-        controller.state.recover(controller)
+        controller.input_word = str()
+        controller.change_to_state(WordDisplay)
 
     @staticmethod
     def c_p(controller):
@@ -175,8 +186,18 @@ class SearchControllerState(ControllerState):
         """
         controller.search_window.recover()
 
+    @staticmethod
+    def c_k(controller):
+        """
+        进入翻译状态
+        """
+        controller.input_word = str()
+        controller.relevant_words = None
+        controller.fix_background()
+        controller.change_to_state(Translate)
 
-class DisplayControllerState(ControllerState):
+
+class WordDisplay(ControllerState):
     """
     展示状态下的各种操作处理
     """
@@ -186,7 +207,7 @@ class DisplayControllerState(ControllerState):
         """
         切换到查询状态
         """
-        controller.change_to_state(SearchControllerState)
+        controller.change_to_state(WordInput)
         controller.state.alpha(controller, ch)
 
     @staticmethod
@@ -201,5 +222,56 @@ class DisplayControllerState(ControllerState):
         """
         恢复展示状态原来的内容
         """
-        controller.fix()
-        controller.display_window.recover()
+        controller.fix_background()
+        controller.word_meanings_window.recover()
+
+    @staticmethod
+    def c_k(controller):
+        """
+        进入翻译状态
+        """
+        controller.change_to_state(Translate)
+
+
+class Translate(ControllerState):
+
+    @staticmethod
+    def recover(controller):
+        controller.fix_background()
+        controller.translation_window.recover()
+
+    @staticmethod
+    def alpha(controller, ch):
+        if ch == ' ' and len(controller.input_sentence) == 0:
+            return
+        controller.input_sentence += ch
+        controller.translation_window.show_input(controller.input_sentence)
+
+    @staticmethod
+    def punctuation(controller, p):
+        controller.input_sentence += p
+        controller.translation_window.show_input(controller.input_sentence)
+
+    @staticmethod
+    def esc(controller):
+        controller.change_to_state(WordDisplay)
+
+    @staticmethod
+    def c_k(controller):
+        controller.change_to_state(WordDisplay)
+
+    @staticmethod
+    def backspace(controller):
+        controller.input_sentence = controller.input_sentence[:-1]
+        controller.translation_window.show_input(controller.input_sentence)
+
+    @staticmethod
+    def c_l(controller):
+        controller.input_sentence = str()
+        controller.translation_window.show_input(controller.input_sentence)
+
+    @staticmethod
+    def enter(controller):
+        translate_result = controller.translator.translate(controller.input_sentence)
+        if translate_result is not None:
+            controller.translation_window.show_result(translate_result)

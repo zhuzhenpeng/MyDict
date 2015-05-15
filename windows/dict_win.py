@@ -3,7 +3,7 @@ import math
 import configparser
 
 
-class DisplayWordWindow():
+class WordMeaningsWindow():
     """
     展示以下内容的窗口：
     1 英文单词的中文解释
@@ -13,7 +13,7 @@ class DisplayWordWindow():
 
     def __init__(self, window):
         """
-        :window: curses.newwin()产生的窗口
+        :param window: 用作展示的窗口，由curses产生
         """
         self._window = window
         self._maxy, self._maxx = window.getmaxyx()
@@ -45,7 +45,7 @@ class DisplayWordWindow():
         4.例句的坐标
         """
         config = configparser.ConfigParser()
-        config.read('CONFIG')
+        config.read('CONFIG', encoding='utf-8')
         self._WELCOME = config['HomePage']['welcome']
         self._WELCOME_X = int(config['HomePage']['welcome_x'])
         self._WELCOME_Y = int(config['HomePage']['welcome_y'])
@@ -57,9 +57,9 @@ class DisplayWordWindow():
         self._PIC_X = int(config['HomePage']['pic_x'])
         self._PIC_Y = int(config['HomePage']['pic_y'])
         if self._PIC_X == 0:
-            self._PIC_X = self._maxx // 8 + 2
+            self._PIC_X = (self._maxx - 75) // 2
         if self._PIC_Y == 0:
-            self._PIC_Y = self._WELCOME_Y + 3
+            self._PIC_Y = self._WELCOME_Y + (self._maxy - 25) // 2
 
         self._MEANINGS_X = int(config['Word']['meanings_x'])
         self._MEANINGS_Y = int(config['Word']['meanings_y'])
@@ -175,15 +175,9 @@ class DisplayWordWindow():
 
     def recover(self):
         """
-        恢复窗口内容
+        恢复并显示窗口
         """
         self._window.touchwin()
-        self._window.refresh()
-
-    def refresh(self):
-        """
-        刷新窗口
-        """
         self._window.refresh()
 
     def clear(self):
@@ -191,3 +185,79 @@ class DisplayWordWindow():
         清空屏幕
         """
         self._window.clear()
+
+
+class SearchWindow():
+    """
+    进行单词查询时左侧的窗口
+    """
+
+    def __init__(self, input_win, relevant_win):
+        """
+        :input_win:     输入单词的窗口
+        :relevant_win:  显示相关单词的窗口
+        """
+        self._input_window = input_win
+        self._relevant_window = relevant_win
+        self._rmaxy, self._rmaxx = relevant_win.getmaxyx()
+
+    def _fix(self):
+        """
+        修复窗口，让窗口在任何情况下都显示以下内容
+        """
+        self._input_window.border('|', '|', '-', '-',
+                                  '+', '+', '+', '+')
+        self._relevant_window.border('|', '|', '-', '-',
+                                     '+', '+', '+', '+')
+        self._refresh()
+
+    def _refresh(self):
+        """
+        刷新窗口
+        """
+        self._input_window.refresh()
+        self._relevant_window.refresh()
+
+    def max_word_width(self):
+        """
+        返回窗口可以显示英文单词的宽度
+        """
+        return self._rmaxx - 4
+
+    def recover(self):
+        """
+        恢复并显示窗口
+        """
+        self._input_window.touchwin()
+        self._relevant_window.touchwin()
+        self._refresh()
+
+    def show_input_word(self, word):
+        """
+        展示输入的单词
+        """
+        self._input_window.clear()
+        self._input_window.addstr(1, 1, word)
+        self._fix()
+
+    def show_relevant(self, relevant, highlight_index):
+        """
+        展示候选单词
+        :relevant:          备选词集合，数量有可能大于能显示的数量
+        :highlight_index:   需要高亮的备选词下标
+        :return:            最后一个能显示的单词的下标
+        """
+        self._relevant_window.clear()
+        word_y = 1
+        max_index = 0
+        for word in relevant:
+            if word_y > self._rmaxy - 2:
+                break
+            if max_index == highlight_index:
+                self._relevant_window.addstr(word_y, 1, word, curses.color_pair(1))
+            else:
+                self._relevant_window.addstr(word_y, 1, word)
+            word_y += 1
+            max_index += 1
+        self._fix()
+        return max_index - 1
