@@ -12,3 +12,7 @@ dict.db
 
 # 运行脚本
 mydict
+
+# os x
+.DS_Store
+*/.DS_Store

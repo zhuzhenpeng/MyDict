@@ -20,7 +20,7 @@ class WordMeaningsWindow():
         self._read_conf()
 
         # 设置版本号
-        self._VERSION = 'MyDict V1.9'
+        self._VERSION = 'MyDict V2.0'
         self._window.addstr(self._maxy - 1, self._maxx - 12,
                             self._VERSION, curses.color_pair(1))
 

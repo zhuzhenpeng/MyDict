@@ -53,7 +53,8 @@ class MainController:
 
         # 中文符号的unicode
         self.zh_punctuations = {
-            '，', '。', '？', '！', '；', '、', '“', '‘', '【', '】', '（', '）', '《', '》', '￥'
+            '，', '。', '？', '！', '；', '、', '“', '‘', '【', '】',
+            '（', '）', '《', '》', '￥'
         }
 
     @staticmethod
@@ -74,7 +75,7 @@ class MainController:
         :param p: 标点符号对应的unicode码
         :return:
         """
-        return chr(p) in string.punctuation or p in self.zh_punctuations
+        return chr(p) in string.punctuation or chr(p) in self.zh_punctuations
 
     def work(self):
         """
