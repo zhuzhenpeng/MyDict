@@ -1,6 +1,6 @@
 # MyDict
 
-![demonstrate](https://raw.githubusercontent.com/zhuzhenpeng/MyDict/master/images/demonstrate.gif)
+![demonstrate](resources/demonstrate.gif)
 
 ## 功能特性
 - 离线、在线查询英文单词
