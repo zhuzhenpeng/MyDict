@@ -82,7 +82,7 @@ class WordMeaningsWindow():
         max_line_length = 0
         line_cnt = 0
 
-        with open('PICTURE', 'r') as pic_file:
+        with open('resources/PICTURE', 'r') as pic_file:
             for line in pic_file:
                 if len(line) > max_line_length:
                     max_line_length = len(line)

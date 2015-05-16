@@ -4,7 +4,7 @@ def get_trie():
     :return:词典树实例
     """
     trie = Trie()
-    with open('./local_words', mode='r') as words:
+    with open('./resources/local_words', mode='r') as words:
         for word in words:
             trie.insert(word.strip())
     return trie
