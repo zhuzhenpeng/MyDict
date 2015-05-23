@@ -90,12 +90,12 @@ class WordInput(ControllerState):
         """
         # 忽略首字符时空格的输入
         if ch == ' ' and len(controller.input_word) == 0:
-            return
+            controller.change_to_state(WordDisplay)
         # 保证输入长度合法
-        if len(controller.input_word) < controller.word_max_length:
+        elif len(controller.input_word) < controller.word_max_length:
             controller.input_word += ch
-        controller.search_window.show_input_word(controller.input_word)
-        WordInput._update_relevant(controller)
+            controller.search_window.show_input_word(controller.input_word)
+            WordInput._update_relevant(controller)
 
     @staticmethod
     def enter(controller):

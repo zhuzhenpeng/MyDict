@@ -3,7 +3,7 @@ import math
 import configparser
 
 
-class WordMeaningsWindow():
+class WordMeaningsWindow:
     """
     展示以下内容的窗口：
     1 英文单词的中文解释
@@ -187,7 +187,7 @@ class WordMeaningsWindow():
         self._window.clear()
 
 
-class SearchWindow():
+class SearchWindow:
     """
     进行单词查询时左侧的窗口
     """
@@ -203,7 +203,7 @@ class SearchWindow():
 
     def _fix(self):
         """
-        修复窗口，让窗口在任何情况下都显示以下内容
+        修复窗口，让窗口边框显示正常
         """
         self._input_window.border('|', '|', '-', '-',
                                   '+', '+', '+', '+')

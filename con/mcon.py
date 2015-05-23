@@ -91,39 +91,39 @@ class MainController:
                     self.state.alpha(self, character)
 
                 # 符号输入
-                if self._is_punctuation_input(ch_num):
+                elif self._is_punctuation_input(ch_num):
                     self.state.punctuation(self, character)
 
                 # 输入Esc
-                if ch_num == 27:
+                elif ch_num == 27:
                     self.state.esc(self)
 
                 # 输入BackSpace,也相当于OS X中的delete
-                if ch_num == 127:
+                elif ch_num == 127:
                     self.state.backspace(self)
 
                 # 输入C-l
-                if ch_num == 12:
+                elif ch_num == 12:
                     self.state.c_l(self)
 
                 # 输入Enter
-                if ch_num == 10:
+                elif ch_num == 10:
                     self.state.enter(self)
 
                 # 输入C-n
-                if ch_num == 14:
+                elif ch_num == 14:
                     self.state.c_n(self)
 
                 # 输入C-p
-                if ch_num == 16:
+                elif ch_num == 16:
                     self.state.c_p(self)
 
                 # 输入Tab
-                if ch_num == 9:
+                elif ch_num == 9:
                     self.state.tab(self)
 
                 # 输入C-k
-                if ch_num == 11:
+                elif ch_num == 11:
                     self.state.c_k(self)
 
             except StopIteration:
